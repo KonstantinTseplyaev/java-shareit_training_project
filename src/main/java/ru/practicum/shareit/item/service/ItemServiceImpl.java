@@ -47,9 +47,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> searchItemsByText(String text) {
-        checkTextForSearch(text);
-        List<Item> items = itemRepository.getAllItems();
         List<ItemDto> result = new ArrayList<>();
+        if (text.isEmpty()) {
+            return result;
+        }
+        List<Item> items = itemRepository.getAllItems();
         for (Item item : items) {
             if (item.getName().toLowerCase().contains(text) || item.getDescription().toLowerCase().contains(text)) {
                 if (item.getAvailable()) {
@@ -67,12 +69,6 @@ public class ItemServiceImpl implements ItemService {
 
         if (itemDto.getAvailable() == null) {
             throw new ItemAvailableException("у вещи не указан статус доступа для аренды");
-        }
-    }
-
-    private void checkTextForSearch(String text) {
-        if (text.isBlank()) {
-            throw new RequestParamException("текст для поиска вещи не может быть пустым");
         }
     }
 
