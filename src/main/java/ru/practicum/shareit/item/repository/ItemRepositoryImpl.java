@@ -45,13 +45,30 @@ public class ItemRepositoryImpl implements ItemRepository {
         return getById(item.getId());
     }
 
+    @Override
+    public List<Item> getItemsByText(String text) {
+        List<Item> result = new ArrayList<>();
+        for (Item item : itemMap.values()) {
+            if (item.getName().toLowerCase().contains(text)
+                    || item.getDescription().toLowerCase().contains(text)) {
+                if (item.getAvailable()) {
+                    result.add(item);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public void checkValidId(Long itemId) {
         if (!itemMap.containsKey(itemId)) {
             throw new ValidationUserException("вещи с id " + itemId + " не существует");
         }
     }
 
+    @Override
     public void checkValidId(Long userId, Long itemId) {
+        checkValidId(itemId);
         if (userAndItem.containsKey(userId)) {
             if (!userAndItem.get(userId).contains(itemId)) {
                 throw new UserNotFoundException("у пользователя " + userId + " нет вещи с id " + itemId);
@@ -59,10 +76,5 @@ public class ItemRepositoryImpl implements ItemRepository {
         } else {
             throw new UserNotFoundException("пользователь с id " + userId + " не найден");
         }
-    }
-
-    @Override
-    public List<Item> getAllItems() {
-        return new ArrayList<>(itemMap.values());
     }
 }

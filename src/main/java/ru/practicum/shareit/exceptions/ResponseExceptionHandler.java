@@ -26,8 +26,8 @@ public class ResponseExceptionHandler extends DefaultHandlerExceptionResolver {
                 exp.getMessage())));
     }
 
-    @ExceptionHandler(value = ItemAvailableException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExpCount(final ItemAvailableException exp) {
+    @ExceptionHandler(value = ItemStatusException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExpCount(final ItemStatusException exp) {
         log.error(exp.getMessage());
         return ResponseEntity.status(400).body((Map.of("error", "Ошибка статуса доступности вещи", "errorMessage",
                 exp.getMessage())));

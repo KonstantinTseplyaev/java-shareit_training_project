@@ -47,6 +47,7 @@ public class UserRepositoryImpl implements UserRepository {
         usersRepository.remove(id);
     }
 
+    @Override
     public void checkUserId(Long id) {
         if (!usersRepository.containsKey(id))
             throw new UserNotFoundException("пользователя с id " + id + " не существует");

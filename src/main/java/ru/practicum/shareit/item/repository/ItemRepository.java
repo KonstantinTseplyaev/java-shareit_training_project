@@ -13,5 +13,9 @@ public interface ItemRepository {
 
     Item update(Item item);
 
-    List<Item> getAllItems();
+    void checkValidId(Long itemId);
+
+    void checkValidId(Long userId, Long itemId);
+
+    List<Item> getItemsByText(String text);
 }

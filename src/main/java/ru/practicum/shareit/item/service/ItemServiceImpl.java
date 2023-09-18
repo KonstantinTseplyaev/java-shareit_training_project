@@ -2,36 +2,42 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exceptions.ItemAvailableException;
-import ru.practicum.shareit.exceptions.RequestParamException;
+import ru.practicum.shareit.exceptions.ItemStatusException;
 import ru.practicum.shareit.exceptions.ValidationUserException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.mapper.MapperUtil;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private long currentId = 0;
     private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
 
     @Override
     public ItemDto getItemById(Long id) {
+        itemRepository.checkValidId(id);
         return MapperUtil.convertToItemDto(itemRepository.getById(id));
     }
 
     @Override
     public List<ItemDto> getAllItemsByUserId(Long userId) {
+        userRepository.checkUserId(userId);
         List<Item> items = itemRepository.getAllByUserId(userId);
         return MapperUtil.convertList(items, MapperUtil::convertToItemDto);
     }
 
     @Override
-    public ItemDto createItem(ItemDto itemDto) {
+    public ItemDto createItem(ItemDto itemDto, Long owner) {
+        userRepository.checkUserId(owner);
+        itemDto.setOwner(owner);
         checkValidItem(itemDto);
         Item newItem = MapperUtil.convertFromItemDto(itemDto);
         newItem.setId(++currentId);
@@ -39,7 +45,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto updateItem(ItemDto itemDto) {
+    public ItemDto updateItem(ItemDto itemDto, Long userId, Long itemId) {
+        itemRepository.checkValidId(userId, itemId);
+        itemDto.setOwner(userId);
+        itemDto.setId(itemId);
         Item item = updateItemFromDtoParam(itemDto);
         Item updateItem = itemRepository.update(item);
         return MapperUtil.convertToItemDto(updateItem);
@@ -47,28 +56,24 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> searchItemsByText(String text) {
+        String textForSearch = text.toLowerCase(Locale.ROOT);
         List<ItemDto> result = new ArrayList<>();
-        if (text.isEmpty()) {
+        if (textForSearch.isEmpty()) {
             return result;
-        }
-        List<Item> items = itemRepository.getAllItems();
-        for (Item item : items) {
-            if (item.getName().toLowerCase().contains(text) || item.getDescription().toLowerCase().contains(text)) {
-                if (item.getAvailable()) {
-                    result.add(MapperUtil.convertToItemDto(item));
-                }
-            }
+        } else {
+            List<Item> items = itemRepository.getItemsByText(textForSearch);
+            result = MapperUtil.convertList(items, MapperUtil::convertToItemDto);
         }
         return result;
     }
 
-    private void checkValidItem(ItemDto itemDto) {
+    private static void checkValidItem(ItemDto itemDto) {
         if (itemDto.getName() == null || itemDto.getDescription() == null) {
             throw new ValidationUserException("не указаны имя или описание вещи");
         }
 
         if (itemDto.getAvailable() == null) {
-            throw new ItemAvailableException("у вещи не указан статус доступа для аренды");
+            throw new ItemStatusException("у вещи не указан статус доступа для аренды");
         }
     }
 

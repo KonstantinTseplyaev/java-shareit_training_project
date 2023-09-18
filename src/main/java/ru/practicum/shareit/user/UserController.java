@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserDto getUserById(@PathVariable Long userId) {
+    public UserDto getUserById(@PathVariable long userId) {
         log.info("Get-запрос: получение пользователя по id {}.", userId);
         return userService.getUserById(userId);
     }
@@ -42,7 +42,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserDto updateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
+    public UserDto updateUser(@PathVariable long userId, @RequestBody UserDto userDto) {
         log.info("Patch-запрос: обновление существующего пользователя под id: {}.", userId);
         return userService.updateUser(userId, userDto);
     }
@@ -54,7 +54,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteUserById(@PathVariable Long userId) {
+    public void deleteUserById(@PathVariable long userId) {
         log.info("Delete-запрос: удаление пользователя по id {}.", userId);
         userService.deleteUserById(userId);
     }
