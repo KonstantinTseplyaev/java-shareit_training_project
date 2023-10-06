@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.item.dto.CommentCreationDto;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemCreationDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
@@ -25,9 +28,10 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable long itemId) {
+    public ItemDto getItemById(@PathVariable long itemId,
+                               @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("Get-запрос: получение вещи по id {}.", itemId);
-        return itemService.getItemById(itemId);
+        return itemService.getItemById(itemId, userId);
     }
 
     @GetMapping
@@ -38,7 +42,7 @@ public class ItemController {
 
     @PostMapping
     public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") long userId,
-                              @Valid @RequestBody ItemDto itemDto) {
+                              @Valid @RequestBody ItemCreationDto itemDto) {
         log.info("Post-запрос: создание нового итема {} пользователем {}.", itemDto, userId);
         return itemService.createItem(itemDto, userId);
     }
@@ -54,5 +58,13 @@ public class ItemController {
     public List<ItemDto> searchItemsByText(@RequestParam String text) {
         log.info("Get-запрос: поиск вещи по тексту {} в названии или описании.", text);
         return itemService.searchItemsByText(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") long userId,
+                                 @PathVariable long itemId,
+                                 @Valid @RequestBody CommentCreationDto comment) {
+        log.info("Post-запрос: добавление комментария от пользователя {} к вещи {}.", userId, itemId);
+        return itemService.addComment(userId, itemId, comment);
     }
 }

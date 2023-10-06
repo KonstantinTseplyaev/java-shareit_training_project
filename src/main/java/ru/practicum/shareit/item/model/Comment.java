@@ -16,25 +16,26 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import java.time.LocalDateTime;
 
 @Data
-@Builder
 @Entity
-@Table(name = "items", schema = "public")
+@Table(name = "comments", schema = "public")
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Item {
+public class Comment {
     @Positive
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
-    private String name;
-    @NotBlank
-    private String description;
-    @Builder.Default
-    private Boolean available = null;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    private Item item;
+    @NotBlank
+    private String text;
+    private LocalDateTime created;
 }
