@@ -29,7 +29,6 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserService userService;
     private final ItemService itemService;
-    LocalDateTime now = LocalDateTime.now();
 
     @Override
     public BookingDto createBooking(long userId, BookingCreationDto bookingDto) {
@@ -89,7 +88,7 @@ public class BookingServiceImpl implements BookingService {
         userService.getUser(userId);
         List<Booking> bookings;
         State currentState = State.valueOf(state);
-        LocalDateTime currentNow = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
         switch (currentState) {
             case ALL:
                 bookings = bookingRepository.findByUserIdOrderByStartDesc(userId);
@@ -99,11 +98,11 @@ public class BookingServiceImpl implements BookingService {
                         .findBookingsByUserIdAndStartAfterOrderByStartDesc(userId, now);
                 break;
             case PAST:
-                bookings = bookingRepository.findByUserIdAndEndBeforeOrderByStartDesc(userId, currentNow);
+                bookings = bookingRepository.findByUserIdAndEndBeforeOrderByStartDesc(userId, now);
                 break;
             case CURRENT:
                 bookings = bookingRepository
-                        .findByUserIdAndStartBeforeAndEndAfterOrderByStartAsc(userId, currentNow, currentNow);
+                        .findByUserIdAndStartBeforeAndEndAfterOrderByStartAsc(userId, now, now);
                 break;
             case WAITING:
             case REJECTED:
@@ -121,8 +120,7 @@ public class BookingServiceImpl implements BookingService {
         userService.getUser(ownerId);
         List<Booking> bookings;
         State currentState = State.valueOf(state);
-        LocalDateTime currentNow = LocalDateTime.now();
-        //объясню ситуацию, почему для future используется другой таймстап. Это нужно для того, чтобы проходились тесты на запрос future букингов. С момента создания букинга с id 1 и до запроса всех future букингов проходит примерно секунда, за эту секунду этот букинг успевает стать из future уже current, не попадает в выборку и валит тесты. Проверял сто раз на бОльших интервалах, метод работает корректно
+        LocalDateTime now = LocalDateTime.now();
         switch (currentState) {
             case ALL:
                 bookings = bookingRepository.findByItemOwnerIdOrderByStartDesc(ownerId);
@@ -131,11 +129,11 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.findBookingsByItemOwnerIdAndStartAfterOrderByStartDesc(ownerId, now);
                 break;
             case PAST:
-                bookings = bookingRepository.findByItemOwnerIdAndEndBeforeOrderByStartDesc(ownerId, currentNow);
+                bookings = bookingRepository.findByItemOwnerIdAndEndBeforeOrderByStartDesc(ownerId, now);
                 break;
             case CURRENT:
                 bookings = bookingRepository
-                        .findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(ownerId, currentNow, currentNow);
+                        .findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(ownerId, now, now);
                 break;
             case WAITING:
             case REJECTED:
