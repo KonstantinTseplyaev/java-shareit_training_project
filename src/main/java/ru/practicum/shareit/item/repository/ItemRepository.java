@@ -6,10 +6,10 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
-    List<Item> findByUserIdOrderById(long userId);
 
     @Query(value = "select * " +
             "from items as i " +
@@ -17,4 +17,8 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "or upper(i.description) like %?1% " +
             "and i.available = true", nativeQuery = true)
     List<Item> findByNameOrDescriptionContaining(String text);
+
+    Optional<Item> findByIdAndOwnerId(long itemId, long ownerId);
+
+    List<Item> findByOwnerId(long ownerId);
 }

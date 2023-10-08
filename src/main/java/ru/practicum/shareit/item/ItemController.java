@@ -35,9 +35,9 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getAllItemsByUserId(@RequestHeader("X-Sharer-User-Id") long userId) {
-        log.info("Get-запрос: получение всех вещей пользователя с id {}.", userId);
-        return itemService.getAllItemsByUserId(userId);
+    public List<ItemDto> getAllItemsByUserId(@RequestHeader("X-Sharer-User-Id") long ownerId) {
+        log.info("Get-запрос: получение всех вещей пользователя с id {}.", ownerId);
+        return itemService.getAllItemsByOwnerId(ownerId);
     }
 
     @PostMapping

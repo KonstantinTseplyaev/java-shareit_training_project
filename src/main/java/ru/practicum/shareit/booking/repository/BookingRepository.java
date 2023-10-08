@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.model.State;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
@@ -52,6 +53,22 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "order by b.time_from asc " +
             "limit 1", nativeQuery = true)
     Optional<Booking> findByItemIdAndNextBooking(long itemId);
+
+    @Query(value = "select * from bookings as b " +
+            "where b.item_id in ?1 " +
+            "and b.time_from in " +
+            "(select max_time from (select lb.item_id as item, MAX(lb.time_from) as max_time " +
+            "from (select * from bookings where time_from <= now() and current_state = 'APPROVED') as lb " +
+            "group by lb.item_id));", nativeQuery = true)
+    List<Booking> findAllByItemIdAndLastBooking(Set<Long> itemId);
+
+    @Query(value = "select * from bookings as b " +
+            "where b.item_id in ?1 " +
+            "and b.time_from in " +
+            "(select max_time from (select lb.item_id as item, MIN(lb.time_from) as max_time " +
+            "from (select * from bookings where time_from > now() and current_state = 'APPROVED') as lb " +
+            "group by lb.item_id));", nativeQuery = true)
+    List<Booking> findAllByItemIdAndNextBooking(Set<Long> itemId);
 
     boolean existsByUserIdAndItemIdAndEndBefore(long userId, long itemId, LocalDateTime now);
 }

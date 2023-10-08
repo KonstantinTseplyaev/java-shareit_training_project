@@ -35,6 +35,6 @@ public class Item {
     @Builder.Default
     private Boolean available = null;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "owner_id")
+    private User owner;
 }

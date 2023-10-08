@@ -7,6 +7,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingForItemDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.State;
+import ru.practicum.shareit.item.dto.CommentCreationDto;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemForBookingDto;
 import ru.practicum.shareit.item.dto.ItemCreationDto;
@@ -16,6 +17,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -45,7 +47,7 @@ public class MapperUtil {
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
-                .user(item.getUser().getId())
+                .owner(item.getOwner().getId())
                 .build();
     }
 
@@ -53,7 +55,8 @@ public class MapperUtil {
         return modelMapper.map(item, ItemForBookingDto.class);
     }
 
-    public static ItemDto convertToItemDto(Item item, BookingForItemDto last, BookingForItemDto next, List<CommentDto> comments) {
+    public static ItemDto convertToItemDto(Item item, BookingForItemDto last,
+                                           BookingForItemDto next, List<CommentDto> comments) {
         ItemDto itemDto = convertToItemDto(item);
         itemDto.setLastBooking(last);
         itemDto.setNextBooking(next);
@@ -72,7 +75,7 @@ public class MapperUtil {
                 .name(itemCreationDto.getName())
                 .description(itemCreationDto.getDescription())
                 .available(itemCreationDto.getAvailable())
-                .user(owner)
+                .owner(owner)
                 .build();
     }
 
@@ -83,7 +86,7 @@ public class MapperUtil {
                 .start(bookingCreationDto.getStart())
                 .end(bookingCreationDto.getEnd())
                 .state(State.WAITING)
-                .itemOwnerId(item.getUser().getId())
+                .itemOwnerId(item.getOwner().getId())
                 .build();
     }
 
@@ -106,16 +109,26 @@ public class MapperUtil {
                 .start(booking.getStart())
                 .end(booking.getEnd())
                 .status(booking.getState())
+                .itemId(booking.getItem().getId())
                 .build();
     }
 
     public static CommentDto convertToCommentDto(Comment comment) {
         return CommentDto.builder()
-                .authorName(comment.getUser().getName())
+                .authorName(comment.getAuthor().getName())
                 .itemId(comment.getItem().getId())
                 .id(comment.getId())
                 .text(comment.getText())
                 .created(comment.getCreated())
+                .build();
+    }
+
+    public static Comment convertFromCommentCreationDto(CommentCreationDto commentDto, User author, Item item) {
+        return Comment.builder()
+                .item(item)
+                .author(author)
+                .text(commentDto.getText())
+                .created(LocalDateTime.now())
                 .build();
     }
 }
