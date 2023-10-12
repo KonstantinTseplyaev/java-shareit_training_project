@@ -3,13 +3,13 @@ package ru.practicum.shareit.item.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.item.model.Review;
+import lombok.Setter;
+import ru.practicum.shareit.booking.dto.BookingForItemDto;
 
 import javax.validation.constraints.NotBlank;
-import java.util.HashSet;
-import java.util.Set;
-
+import java.util.List;
 
 @Data
 @Builder
@@ -24,8 +24,11 @@ public class ItemDto {
     @Builder.Default
     private Boolean available = null;
     private long owner;
-    @Builder.Default
-    private String request = "";
-    @Builder.Default
-    private Set<Review> reviews = new HashSet<>();
+    @Setter
+    @Getter
+    private List<CommentDto> comments;
+    @Setter
+    private BookingForItemDto lastBooking;
+    @Setter
+    private BookingForItemDto nextBooking;
 }
