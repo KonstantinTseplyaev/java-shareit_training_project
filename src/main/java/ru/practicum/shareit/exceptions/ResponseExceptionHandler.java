@@ -75,4 +75,18 @@ public class ResponseExceptionHandler extends DefaultHandlerExceptionResolver {
         return ResponseEntity.status(500).body((Map.of("error", "Unknown state: UNSUPPORTED_STATUS", "errorMessage",
                 exp.getMessage())));
     }
+
+    @ExceptionHandler(value = RequestNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExpCount(final RequestNotFoundException exp) {
+        log.error(exp.getMessage());
+        return ResponseEntity.status(404).body((Map.of("error", "Ошибка при поиске запроса к вещи", "errorMessage",
+                exp.getMessage())));
+    }
+
+    @ExceptionHandler(value = PaginationException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExpCount(final PaginationException exp) {
+        log.error(exp.getMessage());
+        return ResponseEntity.status(400).body((Map.of("error", "Ошибка пагинации", "errorMessage",
+                exp.getMessage())));
+    }
 }

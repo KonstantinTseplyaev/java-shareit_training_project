@@ -5,16 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentDto {
+public class ItemForRequestDto {
     private Long id;
-    private String authorName;
-    private Long itemId;
-    private String text;
-    private LocalDateTime created;
+    private String name;
+    private String description;
+    private Boolean available;
+    private long requestId;
 }

@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.request.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,9 +12,9 @@ import javax.validation.constraints.NotBlank;
 @Data
 @AllArgsConstructor(onConstructor_ = {@JsonCreator(mode = JsonCreator.Mode.DELEGATING)})
 @NoArgsConstructor
-public class CommentCreationDto {
-    @NotBlank
+public class ItemRequestCreationDto {
+    @NotBlank()
     @Length(max = 500)
-    @JsonProperty("text")
-    private String text;
+    @JsonProperty("description")
+    private String description;
 }

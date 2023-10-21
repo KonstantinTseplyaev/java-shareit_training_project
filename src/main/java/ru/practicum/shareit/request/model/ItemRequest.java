@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.shareit.request.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,26 +16,23 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
 @Entity
-@Table(name = "items", schema = "public")
+@Table(name = "requests", schema = "public")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Item {
+public class ItemRequest {
     @Positive
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
-    private String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private User author;
     @NotBlank
     private String description;
-    @Builder.Default
-    private Boolean available = null;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id")
-    private User owner;
-    private Long requestId;
+    private LocalDateTime created;
 }

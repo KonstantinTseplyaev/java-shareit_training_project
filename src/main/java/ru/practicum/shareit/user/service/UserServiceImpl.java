@@ -31,8 +31,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUser(Long id) {
         Optional<User> userOptional = userRepository.findById(id);
-        if (userOptional.isPresent()) return userOptional.get();
-        else throw new UserNotFoundException("пользователя с id " + id + " не существует");
+        return userOptional.orElseThrow(() ->
+                new UserNotFoundException("пользователя с id " + id + " не существует"));
     }
 
     @Override
@@ -63,8 +63,8 @@ public class UserServiceImpl implements UserService {
 
     private User updateUserFromDtoParam(Long userId, UserDto userDto) {
         Optional<User> updatedUserOp = userRepository.findById(userId);
-        if (updatedUserOp.isEmpty()) throw new UserNotFoundException("пользователя с id " + userId + " не существует");
-        User updatedUser = updatedUserOp.get();
+        User updatedUser = updatedUserOp.orElseThrow(() ->
+                new UserNotFoundException("пользователя с id " + userId + " не существует"));
         if (userDto.getName() != null) {
             updatedUser.setName(userDto.getName());
         }

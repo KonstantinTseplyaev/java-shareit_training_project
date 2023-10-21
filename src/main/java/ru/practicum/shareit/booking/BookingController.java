@@ -18,9 +18,9 @@ import ru.practicum.shareit.booking.service.BookingService;
 import javax.validation.Valid;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping(path = "/bookings")
-@Slf4j
 @RequiredArgsConstructor
 public class BookingController {
     private final BookingService bookingService;
@@ -28,7 +28,7 @@ public class BookingController {
     @PostMapping
     public BookingDto createBooking(@RequestHeader("X-Sharer-User-Id") long userId,
                                     @Valid @RequestBody BookingCreationDto bookingDto) {
-        log.info("Post-запрос: запрос на бронироване {} пользователем {}.", bookingDto, userId);
+        log.info("Post-запрос: запрос на бронирование {} пользователем {}.", bookingDto, userId);
         return bookingService.createBooking(userId, bookingDto);
     }
 
@@ -50,15 +50,19 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getAllBookingsByUserId(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                   @RequestParam(defaultValue = "ALL") String state) {
+                                                   @RequestParam(defaultValue = "ALL") String state,
+                                                   @RequestParam(defaultValue = "0") int from,
+                                                   @RequestParam(defaultValue = "20") int size) {
         log.info("Get-запрос: запрос на получение всех бронирований со статусом {} пользователя {}.", state, userId);
-        return bookingService.getAllBookingsByUserId(userId, state);
+        return bookingService.getAllBookingsByUserId(userId, state, from, size);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getAllBookingsByOwnerId(@RequestHeader("X-Sharer-User-Id") long ownerId,
-                                                    @RequestParam(defaultValue = "ALL") String state) {
+                                                    @RequestParam(defaultValue = "ALL") String state,
+                                                    @RequestParam(defaultValue = "0") int from,
+                                                    @RequestParam(defaultValue = "20") int size) {
         log.info("Get-запрос: запрос на получение всех бронирований со статусом {} владельца {}.", state, ownerId);
-        return bookingService.getAllBookingsByOwnerId(ownerId, state);
+        return bookingService.getAllBookingsByOwnerId(ownerId, state, from, size);
     }
 }

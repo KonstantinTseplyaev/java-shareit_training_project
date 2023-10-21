@@ -35,9 +35,11 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getAllItemsByUserId(@RequestHeader("X-Sharer-User-Id") long ownerId) {
+    public List<ItemDto> getAllItemsByUserId(@RequestHeader("X-Sharer-User-Id") long ownerId,
+                                             @RequestParam(defaultValue = "0") int from,
+                                             @RequestParam(defaultValue = "20") int size) {
         log.info("Get-запрос: получение всех вещей пользователя с id {}.", ownerId);
-        return itemService.getAllItemsByOwnerId(ownerId);
+        return itemService.getAllItemsByOwnerId(ownerId, from, size);
     }
 
     @PostMapping
@@ -55,9 +57,11 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItemsByText(@RequestParam String text) {
+    public List<ItemDto> searchItemsByText(@RequestParam String text,
+                                           @RequestParam(defaultValue = "0") int from,
+                                           @RequestParam(defaultValue = "20") int size) {
         log.info("Get-запрос: поиск вещи по тексту {} в названии или описании.", text);
-        return itemService.searchItemsByText(text);
+        return itemService.searchItemsByText(text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")

@@ -23,7 +23,8 @@ public class ItemDto {
     private String description;
     @Builder.Default
     private Boolean available = null;
-    private long owner;
+    private Long owner;
+    private Long requestId;
     @Setter
     @Getter
     private List<CommentDto> comments;
