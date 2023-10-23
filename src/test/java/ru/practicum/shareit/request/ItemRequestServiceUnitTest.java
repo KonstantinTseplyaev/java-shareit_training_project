@@ -173,15 +173,6 @@ public class ItemRequestServiceUnitTest {
     }
 
     @Test
-    void getAllRequests_withIncorrectPaginationParams() {
-        when(userRepository.existsById(user2.getId()))
-                .thenReturn(true);
-
-        assertThatThrownBy(() -> itemRequestService.getAllRequests(user2.getId(), -1, 2)).isInstanceOf(PaginationException.class)
-                .hasMessageContaining("неверные параметры пагинации");
-    }
-
-    @Test
     void getRequestById() {
         List<Item> items = List.of(item1);
         when(userRepository.existsById(user2.getId()))

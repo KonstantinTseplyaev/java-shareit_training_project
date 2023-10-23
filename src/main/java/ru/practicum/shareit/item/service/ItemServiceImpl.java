@@ -10,7 +10,6 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.AvailableStatusException;
 import ru.practicum.shareit.exceptions.ItemNotFoundException;
-import ru.practicum.shareit.exceptions.PaginationException;
 import ru.practicum.shareit.exceptions.RequestNotFoundException;
 import ru.practicum.shareit.exceptions.UserNotFoundException;
 import ru.practicum.shareit.exceptions.ParamValidationException;
@@ -38,6 +37,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
@@ -68,7 +68,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public List<ItemDto> getAllItemsByOwnerId(long ownerId, int from, int size) {
-        checkPaginationParams(from, size);
         Pageable pageable = PageRequest.of(from / size, size);
         Map<Long, Item> itemMap = itemRepository.findByOwnerId(ownerId, pageable)
                 .stream().collect(Collectors.toMap(Item::getId, Function.identity()));
@@ -86,7 +85,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional
     public ItemDto createItem(ItemCreationDto itemDto, long ownerId) {
         checkValidItem(itemDto);
         Optional<User> ownerOpt = userRepository.findById(ownerId);
@@ -101,7 +99,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional
     public ItemDto updateItem(ItemDto itemDto, long userId, long itemId) {
         itemDto.setId(itemId);
         Item item = updateItemFromDtoParam(itemDto, userId);
@@ -110,7 +107,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional
     public CommentDto addComment(long authorId, long itemId, CommentCreationDto comment) {
         Optional<User> authorOpt = userRepository.findById(authorId);
         if (authorOpt.isEmpty()) throw new UserNotFoundException("пользователя с id " + authorId + " не существует");
@@ -126,7 +122,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public List<ItemDto> searchItemsByText(String text, int from, int size) {
-        checkPaginationParams(from, size);
         Pageable pageable = PageRequest.of(from / size, size);
         String textForSearch = text.toUpperCase(Locale.ROOT);
         List<ItemDto> result = new ArrayList<>();
@@ -163,9 +158,5 @@ public class ItemServiceImpl implements ItemService {
             updatedItem.setAvailable(itemDto.getAvailable());
         }
         return updatedItem;
-    }
-
-    private void checkPaginationParams(int from, int size) {
-        if (from < 0 || size < 1) throw new PaginationException("неверные параметры пагинации");
     }
 }

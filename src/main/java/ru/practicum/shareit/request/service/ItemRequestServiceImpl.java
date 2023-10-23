@@ -5,7 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exceptions.PaginationException;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.RequestNotFoundException;
 import ru.practicum.shareit.exceptions.UserNotFoundException;
 import ru.practicum.shareit.item.dto.ItemForRequestDto;
@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository requestRepository;
     private final UserRepository userRepository;
@@ -42,6 +43,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemRequestDto> getAllRequestsByUserId(long userId) {
         checkUser(userId);
         List<ItemRequest> requestList = requestRepository.findByAuthorIdOrderByCreatedDesc(userId);
@@ -55,9 +57,9 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemRequestDto> getAllRequests(long userId, int from, int size) {
         checkUser(userId);
-        if (from < 0 || size < 1) throw new PaginationException("неверные параметры пагинации");
         Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "created"));
         List<ItemRequest> requests = requestRepository.findByAuthorIdIsNot(userId, pageable);
         Set<Long> requestsId = requests.stream().map(ItemRequest::getId).collect(Collectors.toSet());
@@ -70,6 +72,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ItemRequestDto getRequestById(long userId, long requestId) {
         checkUser(userId);
         Optional<ItemRequest> requestOpt = requestRepository.findById(requestId);

@@ -15,28 +15,28 @@ import java.util.Set;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    List<Booking> findByUserIdOrderByStartDesc(long userId, Pageable pageable);
+    List<Booking> findByUserId(long userId, Pageable pageable);
 
-    List<Booking> findBookingsByUserIdAndStartAfterOrderByStartDesc(long userId, LocalDateTime now, Pageable pageable);
+    List<Booking> findBookingsByUserIdAndStartAfter(long userId, LocalDateTime now, Pageable pageable);
 
-    List<Booking> findByUserIdAndEndBeforeOrderByStartDesc(long userId, LocalDateTime now, Pageable pageable);
+    List<Booking> findByUserIdAndEndBefore(long userId, LocalDateTime now, Pageable pageable);
 
     List<Booking> findByUserIdAndStartBeforeAndEndAfterOrderByStartAsc(
             long userId, LocalDateTime now, LocalDateTime now2, Pageable pageable);
 
-    List<Booking> findByUserIdAndStateOrderByStartDesc(long userId, State state, Pageable pageable);
+    List<Booking> findByUserIdAndState(long userId, State state, Pageable pageable);
 
-    List<Booking> findByItemOwnerIdOrderByStartDesc(long userId, Pageable pageable);
+    List<Booking> findByItemOwnerId(long userId, Pageable pageable);
 
-    List<Booking> findBookingsByItemOwnerIdAndStartAfterOrderByStartDesc(
+    List<Booking> findBookingsByItemOwnerIdAndStartAfter(
             long userId, LocalDateTime now, Pageable pageable);
 
-    List<Booking> findByItemOwnerIdAndEndBeforeOrderByStartDesc(long userId, LocalDateTime now, Pageable pageable);
+    List<Booking> findByItemOwnerIdAndEndBefore(long userId, LocalDateTime now, Pageable pageable);
 
-    List<Booking> findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(
+    List<Booking> findByItemOwnerIdAndStartBeforeAndEndAfter(
             long userId, LocalDateTime now, LocalDateTime now2, Pageable pageable);
 
-    List<Booking> findByItemOwnerIdAndStateOrderByStartDesc(long userId, State state, Pageable pageable);
+    List<Booking> findByItemOwnerIdAndState(long userId, State state, Pageable pageable);
 
     List<Booking> findByItemId(long itemId);
 

@@ -102,7 +102,7 @@ public class BookingControllerTest {
                     .andExpect(jsonPath("$.booker.id", is(bookingDto1.getBooker().getId()), Long.class))
                     .andExpect(jsonPath("$.booker.email", is(bookingDto1.getBooker().getEmail())))
                     .andExpect(jsonPath("$.booker.name", is(bookingDto1.getBooker().getName())))
-                    .andExpect(jsonPath("$.start", is(List.of(2023, 12, 1, 23, 30))))  //маппер сериализует дату как json-массив, т.к. я не задал классам формат даты из-за того, что ругаются postman-тесты. Поэтому проверка такая.
+                    .andExpect(jsonPath("$.start", is(List.of(2023, 12, 1, 23, 30))))
                     .andExpect(jsonPath("$.end", is(List.of(2023, 12, 2, 16, 5))))
                     .andExpect(jsonPath("$.status", is(bookingDto1.getStatus().name())));
         }

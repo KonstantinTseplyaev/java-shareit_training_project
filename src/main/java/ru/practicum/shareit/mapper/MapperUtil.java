@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 @Configuration
 public class MapperUtil {
     private static final ModelMapper modelMapper = new ModelMapper();
+    public static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     public static <R, E> List<R> convertList(List<E> list, Function<E, R> converter) {
         return list.stream().map(converter).collect(Collectors.toList());

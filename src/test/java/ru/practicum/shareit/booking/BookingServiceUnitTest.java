@@ -248,7 +248,7 @@ public class BookingServiceUnitTest {
 
         when(userRepository.existsById(user2.getId()))
                 .thenReturn(true);
-        when(bookingRepository.findByUserIdAndStateOrderByStartDesc(anyLong(), any(), any()))
+        when(bookingRepository.findByUserIdAndState(anyLong(), any(), any()))
                 .thenReturn(bookings);
 
         List<BookingDto> bookingsDto = List.of(booking1Dto, booking2Dto);
@@ -264,7 +264,7 @@ public class BookingServiceUnitTest {
 
         when(userRepository.existsById(user2.getId()))
                 .thenReturn(true);
-        when(bookingRepository.findBookingsByUserIdAndStartAfterOrderByStartDesc(anyLong(), any(), any()))
+        when(bookingRepository.findBookingsByUserIdAndStartAfter(anyLong(), any(), any()))
                 .thenReturn(bookings);
 
         List<BookingDto> bookingsDto = List.of(booking1Dto, booking2Dto);
@@ -280,7 +280,7 @@ public class BookingServiceUnitTest {
 
         when(userRepository.existsById(user1.getId()))
                 .thenReturn(true);
-        when(bookingRepository.findByItemOwnerIdAndStateOrderByStartDesc(anyLong(), any(), any()))
+        when(bookingRepository.findByItemOwnerIdAndState(anyLong(), any(), any()))
                 .thenReturn(bookings);
 
         List<BookingDto> bookingsDto = List.of(booking1Dto, booking2Dto);
