@@ -14,29 +14,32 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
         return MapperUtil.convertList(users, MapperUtil::convertToUserDto);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDto getUserById(Long id) {
         return MapperUtil.convertToUserDto(getUser(id));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public User getUser(Long id) {
         Optional<User> userOptional = userRepository.findById(id);
-        if (userOptional.isPresent()) return userOptional.get();
-        else throw new UserNotFoundException("пользователя с id " + id + " не существует");
+        return userOptional.orElseThrow(() ->
+                new UserNotFoundException("пользователя с id " + id + " не существует"));
     }
 
     @Override
-    @Transactional
     public UserDto createUser(UserDto userDto) {
         User newUser = MapperUtil.convertFromUserDto(userDto);
         return MapperUtil.convertToUserDto(userRepository.save(newUser));
@@ -44,7 +47,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public UserDto updateUser(Long userId, UserDto userDto) {
         User user = updateUserFromDtoParam(userId, userDto);
         User updatedUser = userRepository.save(user);
@@ -63,8 +65,8 @@ public class UserServiceImpl implements UserService {
 
     private User updateUserFromDtoParam(Long userId, UserDto userDto) {
         Optional<User> updatedUserOp = userRepository.findById(userId);
-        if (updatedUserOp.isEmpty()) throw new UserNotFoundException("пользователя с id " + userId + " не существует");
-        User updatedUser = updatedUserOp.get();
+        User updatedUser = updatedUserOp.orElseThrow(() ->
+                new UserNotFoundException("пользователя с id " + userId + " не существует"));
         if (userDto.getName() != null) {
             updatedUser.setName(userDto.getName());
         }

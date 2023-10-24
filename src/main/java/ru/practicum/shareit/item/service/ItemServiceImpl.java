@@ -1,12 +1,16 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingForItemDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.AvailableStatusException;
 import ru.practicum.shareit.exceptions.ItemNotFoundException;
+import ru.practicum.shareit.exceptions.RequestNotFoundException;
 import ru.practicum.shareit.exceptions.UserNotFoundException;
 import ru.practicum.shareit.exceptions.ParamValidationException;
 import ru.practicum.shareit.item.dto.CommentCreationDto;
@@ -17,6 +21,8 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.mapper.MapperUtil;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -31,13 +37,16 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
+    private final ItemRequestRepository requestRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public ItemDto getItemById(long itemId, long ownerId) {
         if (!itemRepository.existsById(itemId))
             throw new ItemNotFoundException("вещи с id " + itemId + " не существует");
@@ -53,12 +62,14 @@ public class ItemServiceImpl implements ItemService {
             if (nextOpt.isPresent()) nextBooking = MapperUtil.convertToBookingForItemDto(nextOpt.get());
             return MapperUtil.convertToItemDto(itemOpt.get(), lastBooking, nextBooking, commentsDto);
         }
-        return MapperUtil.convertToItemDto(itemRepository.findById(itemId).get(), commentsDto);
+        return MapperUtil.convertToItemDto(itemRepository.findById(itemId).orElseThrow(), commentsDto);
     }
 
     @Override
-    public List<ItemDto> getAllItemsByOwnerId(long ownerId) {
-        Map<Long, Item> itemMap = itemRepository.findByOwnerId(ownerId)
+    @Transactional(readOnly = true)
+    public List<ItemDto> getAllItemsByOwnerId(long ownerId, int from, int size) {
+        Pageable pageable = PageRequest.of(from / size, size);
+        Map<Long, Item> itemMap = itemRepository.findByOwnerId(ownerId, pageable)
                 .stream().collect(Collectors.toMap(Item::getId, Function.identity()));
         Map<Long, List<CommentDto>> commentMap = MapperUtil.convertList(commentRepository
                         .findByItemIdIn(itemMap.keySet()), MapperUtil::convertToCommentDto)
@@ -78,8 +89,13 @@ public class ItemServiceImpl implements ItemService {
         checkValidItem(itemDto);
         Optional<User> ownerOpt = userRepository.findById(ownerId);
         if (ownerOpt.isEmpty()) throw new UserNotFoundException("пользователя с id " + ownerId + " не существует");
-        Item newItem = MapperUtil.convertFromItemCreationDto(itemDto, ownerOpt.get());
-        return MapperUtil.convertToItemDto(itemRepository.save(newItem));
+        ItemRequest request = null;
+        if (itemDto.getRequestId() != null) {
+            if (!requestRepository.existsById(itemDto.getRequestId()))
+                throw new RequestNotFoundException("никто не запрашивал эту вещь");
+        }
+        Item newItem = itemRepository.save(MapperUtil.convertFromItemCreationDto(itemDto, ownerOpt.get()));
+        return MapperUtil.convertToItemDto(newItem);
     }
 
     @Override
@@ -104,19 +120,21 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchItemsByText(String text) {
+    @Transactional(readOnly = true)
+    public List<ItemDto> searchItemsByText(String text, int from, int size) {
+        Pageable pageable = PageRequest.of(from / size, size);
         String textForSearch = text.toUpperCase(Locale.ROOT);
         List<ItemDto> result = new ArrayList<>();
-        if (textForSearch.isEmpty()) {
+        if (textForSearch.isBlank()) {
             return result;
         } else {
-            List<Item> items = itemRepository.findByNameOrDescriptionContaining(textForSearch);
+            List<Item> items = itemRepository.findByNameOrDescriptionContaining(textForSearch, pageable);
             result = MapperUtil.convertList(items, MapperUtil::convertToItemDto);
         }
         return result;
     }
 
-    private static void checkValidItem(ItemCreationDto itemDto) {
+    private void checkValidItem(ItemCreationDto itemDto) {
         if (itemDto.getName() == null || itemDto.getDescription() == null) {
             throw new ParamValidationException("не указаны имя или описание вещи");
         }
@@ -128,9 +146,8 @@ public class ItemServiceImpl implements ItemService {
 
     private Item updateItemFromDtoParam(ItemDto itemDto, long ownerId) {
         Optional<Item> itemOptional = itemRepository.findByIdAndOwnerId(itemDto.getId(), ownerId);
-        if (itemOptional.isEmpty())
-            throw new UserNotFoundException("вещи с id " + itemDto.getId() + " нет у пользователя " + ownerId);
-        Item updatedItem = itemOptional.get();
+        Item updatedItem = itemOptional.orElseThrow(() ->
+                new UserNotFoundException("вещи с id " + itemDto.getId() + " нет у пользователя " + ownerId));
         if (itemDto.getName() != null) {
             updatedItem.setName(itemDto.getName());
         }

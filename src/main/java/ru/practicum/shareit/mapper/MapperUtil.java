@@ -12,8 +12,12 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemForBookingDto;
 import ru.practicum.shareit.item.dto.ItemCreationDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemForRequestDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.dto.ItemRequestCreationDto;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
@@ -25,6 +29,7 @@ import java.util.stream.Collectors;
 @Configuration
 public class MapperUtil {
     private static final ModelMapper modelMapper = new ModelMapper();
+    public static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     public static <R, E> List<R> convertList(List<E> list, Function<E, R> converter) {
         return list.stream().map(converter).collect(Collectors.toList());
@@ -48,6 +53,7 @@ public class MapperUtil {
                 .description(item.getDescription())
                 .available(item.getAvailable())
                 .owner(item.getOwner().getId())
+                .requestId(item.getRequestId())
                 .build();
     }
 
@@ -76,6 +82,7 @@ public class MapperUtil {
                 .description(itemCreationDto.getDescription())
                 .available(itemCreationDto.getAvailable())
                 .owner(owner)
+                .requestId(itemCreationDto.getRequestId())
                 .build();
     }
 
@@ -129,6 +136,41 @@ public class MapperUtil {
                 .author(author)
                 .text(commentDto.getText())
                 .created(LocalDateTime.now())
+                .build();
+    }
+
+    public static ItemRequest convertFromItemRequestCreationDto(ItemRequestCreationDto itemDto, User author) {
+        return ItemRequest.builder()
+                .author(author)
+                .description(itemDto.getDescription())
+                .created(LocalDateTime.now())
+                .build();
+    }
+
+    public static ItemForRequestDto convertToItemForRequestDto(Item item) {
+        return ItemForRequestDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .requestId(item.getRequestId())
+                .build();
+    }
+
+    public static ItemRequestDto convertToItemRequestDto(ItemRequest request) {
+        return ItemRequestDto.builder()
+                .id(request.getId())
+                .description(request.getDescription())
+                .created(request.getCreated())
+                .build();
+    }
+
+    public static ItemRequestDto convertToItemRequestDto(ItemRequest request, List<ItemForRequestDto> items) {
+        return ItemRequestDto.builder()
+                .id(request.getId())
+                .description(request.getDescription())
+                .created(request.getCreated())
+                .items(items)
                 .build();
     }
 }
