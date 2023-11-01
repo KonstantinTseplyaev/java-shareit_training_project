@@ -6,7 +6,7 @@ services:
       - /var/lib/postgresql/data/
     container_name: shareit-db
     ports:
-      - "6521:5432"
+      - "5432:5432"
     environment:
       - POSTGRES_DB=shareit
       - POSTGRES_USER=booker
