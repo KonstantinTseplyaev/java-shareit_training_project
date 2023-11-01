@@ -13,7 +13,7 @@ services:
       - POSTGRES_PASSWORD=booker
 
   server:
-    build: /server
+    build: ./server
     container_name: shareit-server
     ports:
       - "9090:9090"
@@ -25,7 +25,7 @@ services:
       - POSTGRES_PASSWORD=booker
 
   gateway:
-    build: /gateway
+    build: ./gateway
     container_name: shareit-web
     ports:
       - "8080:8080"
