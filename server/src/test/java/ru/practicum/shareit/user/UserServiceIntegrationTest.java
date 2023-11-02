@@ -1,4 +1,4 @@
-/*package ru.practicum.shareit.user;
+package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
@@ -69,4 +69,4 @@ public class UserServiceIntegrationTest {
         assertThat(updatedUser.getName(), equalTo(update.getName()));
         assertThat(updatedUser.getEmail(), equalTo(update.getEmail()));
     }
-}*/
+}

@@ -1,4 +1,4 @@
-/*package ru.practicum.shareit.item;
+package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
@@ -193,4 +193,4 @@ public class ItemServiceIntegrationTest {
                 MapperUtil.convertToBookingForItemDto(firstBooking), MapperUtil.convertList(List.of(newComment), MapperUtil::convertToCommentDto))));
         assertThat(result, hasItem(MapperUtil.convertToItemDto(newItem2)));
     }
-}*/
+}

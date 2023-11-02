@@ -1,4 +1,3 @@
-/*
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
@@ -6,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Transactional
+@TestPropertySource("classpath:application-test.properties")
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -197,4 +198,3 @@ public class BookingServiceIntegrationTest {
         assertThat(bookingList, equalTo(result));
     }
 }
-*/

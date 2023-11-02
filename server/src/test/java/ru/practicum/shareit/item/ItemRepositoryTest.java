@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-/*
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,4 +125,3 @@ public class ItemRepositoryTest {
         assertTrue(result.contains(i1));
     }
 }
-*/
